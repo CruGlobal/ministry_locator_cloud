@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :ministry_strategies, only: :index
   get 'search/suggest'
 
   get 'home/index'
