@@ -1,0 +1,4 @@
+.ng-cloak {display: none}
+html, body { height: 100%; margin: 0; padding: 0;}
+#map-canvas { height: 70%; width: 50%; margin: 0; padding: 0; float: left;}
+#results-list { float: left; padding-left: 20px }

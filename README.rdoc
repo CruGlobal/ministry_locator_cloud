@@ -1,0 +1,3 @@
+== README
+
+This is an expirament in using AWS Cloudsearch for ministry locator.

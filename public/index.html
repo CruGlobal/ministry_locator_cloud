@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html ng-app="ml">
+<head>
+  <title>MinistryCloud</title>
+  <link rel="stylesheet" media="all" href="/assets/application.css" />
+  <script type="text/javascript"
+          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4oejX9bFAoV1C0PnOZcN73KRSLkYH_FQ">
+  </script>
+</head>
+<body ng-controller="SearchController as searchCtrl" class="ng-cloak"n>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div>
+          <form name="searchForm" ng-submit="searchCtrl.search()" novalidate>
+            <autocomplete ng-model="searchCtrl.search.q" data="location_names" on-select="searchCtrl.select" on-type="searchCtrl.suggest"></autocomplete>
+            <input type="submit" value="Search">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="map-canvas"></div>
+  <div id="results-list">
+    <ul>
+      <li ng-repeat="location in searchCtrl.locations">
+        {{ location.name }}
+      </li>
+    </ul>
+  </div>
+
+  <script src="/assets/application.js"></script>
+</body>
+</html>
