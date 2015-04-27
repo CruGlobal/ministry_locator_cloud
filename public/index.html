@@ -2,33 +2,54 @@
 <html ng-app="ml">
 <head>
   <title>MinistryCloud</title>
-  <link rel="stylesheet" media="all" href="/assets/application.css" />
+  <link rel="stylesheet" media="all" href="/assets/application.css">
   <script type="text/javascript"
-          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4oejX9bFAoV1C0PnOZcN73KRSLkYH_FQ">
+          src="//maps.googleapis.com/maps/api/js?key=AIzaSyD4oejX9bFAoV1C0PnOZcN73KRSLkYH_FQ">
   </script>
+  <style>
+    .angular-google-map-container { height: 700px; }
+  </style>
 </head>
 <body ng-controller="SearchController as searchCtrl" class="ng-cloak">
 
   <div class="container">
-    <div class="row">
+    <div class="row form-group">
       <div class="col-md-12">
         <div>
-          <form name="searchForm" ng-submit="searchCtrl.search()" novalidate>
-            <autocomplete ng-model="searchCtrl.search.q" data="location_names" on-select="searchCtrl.select" on-type="searchCtrl.suggest"></autocomplete>
-            <input type="submit" value="Search">
-          </form>
+          <autocomplete ng-model="searchCtrl.search.q" data="suggestedLocations" on-select="searchCtrl.select" on-type="suggest"></autocomplete>
+          <input type="text"
+                 ng-model="asyncSelected"
+                 placeholder="Search..."
+                 typeahead="location.name for location in suggest($viewValue)"
+                 typeahead-wait-ms="300"
+                 typeahead-on-select="selectLocation($item, $model, $label)"
+                 typeahead-editable="false"
+                 class="form-control">
         </div>
       </div>
     </div>
-  </div>
 
-  <div id="map-canvas"></div>
-  <div id="results-list">
-    <ul>
-      <li ng-repeat="location in searchCtrl.locations">
-        {{ location.name }}
-      </li>
-    </ul>
+    <div class="row">
+      <div class="col-md-4">
+        <p><strong>Ministries Strategies</strong></p>
+        <div class="checkbox" ng-repeat="m in ministries">
+          <label>
+            <input type="checkbox" ng-model="$parent.filterMinistries[m.name]" ng-change="getMarkers()"> {{m.name}}
+          </label>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <ui-gmap-google-map control="mapInstance" center="map.center" zoom="map.zoom" bounds="map.bounds" events="mapEvents">
+          <ui-gmap-marker coords="m" idkey="m.id" ng-repeat="m in markers">
+            <ui-gmap-window options="windowOptions" show="false">
+              <div>
+                <p><strong>{{m.name}}</strong></p>
+              </div>
+            </ui-gmap-window>
+          </ui-gmap-marker>
+        </ui-gmap-google-map>
+      </div>
+    </div>
   </div>
 
   <script src="/assets/application.js"></script>

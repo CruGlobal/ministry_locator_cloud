@@ -20,7 +20,7 @@ class Searcher
       size: size,
       start: start
     }
-    search_params.merge!(query_options: {fields: Array.wrap(params[:fields])}.to_json)
+    #search_params.merge!(query_options: {fields: Array.wrap(params[:fields])}.to_json)
     res = csd.search(search_params)
     locations = []
     if res.hits.found > 0

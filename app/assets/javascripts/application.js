@@ -11,7 +11,9 @@
 // about supported directives.
 //
 //= require angular/angular
-//= require allmighty-autocomplete/script/autocomplete
+//= require lodash/dist/lodash
+//= require angular-bootstrap/ui-bootstrap-tpls
+//= require angular-google-maps/dist/angular-google-maps
 //= require app
 //= require_tree ./services
 //= require_tree ./controllers
