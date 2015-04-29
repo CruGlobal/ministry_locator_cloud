@@ -1,11 +1,10 @@
 class SearchController
-  constructor: (api) ->
-    ctrl = undefined
+  constructor: (uiGmapIsReady, api) ->
     ctrl = this
-    map = undefined
     @mapInstance = {}
     @filterMinistries = {}
     map = undefined
+
     if navigator.geolocation
       navigator.geolocation.getCurrentPosition (pos) ->
         ctrl.map =
@@ -28,10 +27,11 @@ class SearchController
 
       ctrl.ministries = data
 
+    ctrl.mapEvents = idle: ->
+      map = ctrl.mapInstance.getGMap()
+      ctrl.getMarkers()
+
     @getMarkers = ->
-      ministries = undefined
-      nw = undefined
-      se = undefined
       nw = new google.maps.LatLng(map.getBounds().getNorthEast().lat(), map.getBounds().getSouthWest().lng())
       se = new google.maps.LatLng(map.getBounds().getSouthWest().lat(), map.getBounds().getNorthEast().lng())
       ministries = _.keys(_.pick(ctrl.filterMinistries, (v) ->
@@ -44,19 +44,20 @@ class SearchController
       ).success (data) ->
         ctrl.markers = data.locations
 
-
-    @mapEvents = idle: ->
-      map = ctrl.mapInstance.getGMap()
-      ctrl.getMarkers()
-
     @suggest = (typed) ->
       api.get("/search/suggest?q=" + encodeURIComponent(typed)).then (response) ->
         response.data.locations
-
 
     @selectLocation = (item) ->
       ctrl.map.center =
         latitude: item.latitude
         longitude: item.longitude
 
-angular.module("ml").controller "SearchController", [ "api", SearchController ]
+
+    uiGmapIsReady.promise(2).then (instances) ->
+      instances.forEach (inst) ->
+        inst.map.ourID = inst.instance
+        return
+      return
+
+angular.module("ml").controller "SearchController", ["uiGmapIsReady", "api", SearchController ]
