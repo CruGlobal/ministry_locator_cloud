@@ -16,13 +16,12 @@
     <div class="row form-group">
       <div class="col-md-12">
         <div>
-          <autocomplete ng-model="searchCtrl.search.q" data="suggestedLocations" on-select="searchCtrl.select" on-type="suggest"></autocomplete>
           <input type="text"
                  ng-model="asyncSelected"
                  placeholder="Search..."
-                 typeahead="location.name for location in suggest($viewValue)"
+                 typeahead="location.name for location in searchCtrl.suggest($viewValue)"
                  typeahead-wait-ms="300"
-                 typeahead-on-select="selectLocation($item, $model, $label)"
+                 typeahead-on-select="searchCtrl.selectLocation($item, $model, $label)"
                  typeahead-editable="false"
                  class="form-control">
         </div>
@@ -32,16 +31,16 @@
     <div class="row">
       <div class="col-md-4">
         <p><strong>Ministries Strategies</strong></p>
-        <div class="checkbox" ng-repeat="m in ministries">
+        <div class="checkbox" ng-repeat="m in searchCtrl.ministries">
           <label>
-            <input type="checkbox" ng-model="$parent.filterMinistries[m.name]" ng-change="getMarkers()"> {{m.name}}
+            <input type="checkbox" ng-model="searchCtrl.filterMinistries[m.name]" ng-change="searchCtrl.getMarkers()"> {{m.name}}
           </label>
         </div>
       </div>
       <div class="col-md-8">
-        <ui-gmap-google-map control="mapInstance" center="map.center" zoom="map.zoom" bounds="map.bounds" events="mapEvents">
-          <ui-gmap-marker coords="m" idkey="m.id" ng-repeat="m in markers">
-            <ui-gmap-window options="windowOptions" show="false">
+        <ui-gmap-google-map control="searchCtrl.mapInstance" center="searchCtrl.map.center" zoom="searchCtrl.map.zoom" bounds="searchCtrl.map.bounds" events="searchCtrl.mapEvents">
+          <ui-gmap-marker coords="m" idkey="m.id" ng-repeat="m in searchCtrl.markers">
+            <ui-gmap-window show="false">
               <div>
                 <p><strong>{{m.name}}</strong></p>
               </div>
