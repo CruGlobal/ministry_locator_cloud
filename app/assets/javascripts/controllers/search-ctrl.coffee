@@ -21,7 +21,7 @@ class SearchController
           longitude: 81.2989
 
         zoom: 8
-    api.get("/ministry_strategies").success (data) ->
+    api.getMinistryStrategies().success (data) ->
       angular.forEach data, (m) ->
         ctrl.filterMinistries[m.name] = true
 
@@ -37,15 +37,15 @@ class SearchController
       ministries = _.keys(_.pick(ctrl.filterMinistries, (v) ->
         v
       ))
-      api.get("/search/suggest",
-        q: "(or ministries:'" + ministries.join("' ministries:'") + "')"
-        fq: "latlon:['" + nw.lat() + "," + nw.lng() + "','" + se.lat() + "," + se.lng() + "']"
-        parser: "structured"
+      api.getMarkers(
+        ministries: ministries
+        nwBounds: nw
+        seBounds: se
       ).success (data) ->
         ctrl.markers = data.locations
 
     @suggest = (typed) ->
-      api.get("/search/suggest?q=" + encodeURIComponent(typed)).then (response) ->
+      api.search(typed).then (response) ->
         response.data.locations
 
     @selectLocation = (item) ->
