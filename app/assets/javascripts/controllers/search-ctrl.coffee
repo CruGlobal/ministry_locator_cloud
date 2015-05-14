@@ -3,11 +3,10 @@ class SearchController
     ctrl = this
     @mapInstance = {}
     @filterMinistries = {}
-    map = undefined
 
     if navigator.geolocation
       navigator.geolocation.getCurrentPosition (pos) ->
-        ctrl.map =
+        ctrl.mapSettings =
           center:
             latitude: pos.coords.latitude
             longitude: pos.coords.longitude
@@ -15,7 +14,7 @@ class SearchController
           zoom: 10
 
     else
-      ctrl.map =
+      ctrl.mapSettings =
         center:
           latitude: 28.4158
           longitude: 81.2989
@@ -28,10 +27,10 @@ class SearchController
       ctrl.ministries = data
 
     ctrl.mapEvents = idle: ->
-      map = ctrl.mapInstance.getGMap()
       ctrl.getMarkers()
 
     @getMarkers = ->
+      map = ctrl.mapInstance.getGMap()
       nw = new google.maps.LatLng(map.getBounds().getNorthEast().lat(), map.getBounds().getSouthWest().lng())
       se = new google.maps.LatLng(map.getBounds().getSouthWest().lat(), map.getBounds().getNorthEast().lng())
       ministries = _.keys(_.pick(ctrl.filterMinistries, (v) ->
@@ -49,7 +48,7 @@ class SearchController
         response.data.locations
 
     @selectLocation = (item) ->
-      ctrl.map.center =
+      ctrl.mapSettings.center =
         latitude: item.latitude
         longitude: item.longitude
 

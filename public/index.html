@@ -35,7 +35,7 @@
         </div>
       </div>
       <div class="col-md-8">
-        <ui-gmap-google-map control="searchCtrl.mapInstance" center="searchCtrl.map.center" zoom="searchCtrl.map.zoom" bounds="searchCtrl.map.bounds" events="searchCtrl.mapEvents">
+        <ui-gmap-google-map control="searchCtrl.mapInstance" center="searchCtrl.mapSettings.center" zoom="searchCtrl.mapSettings.zoom" bounds="searchCtrl.mapSettings.bounds" events="searchCtrl.mapEvents">
           <ui-gmap-marker coords="m" idkey="m.id" ng-repeat="m in searchCtrl.markers">
             <ui-gmap-window show="false">
               <div>
