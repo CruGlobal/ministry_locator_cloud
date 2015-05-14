@@ -1,32 +1,62 @@
 class SearchController
-  constructor: ($scope, $log, SearchService, MapService) ->
-    @search = {}
-    @locations = []
-    @location_names = []
+  constructor: (uiGmapIsReady, api) ->
     ctrl = this
+    @mapInstance = {}
+    @filterMinistries = {}
 
-    @suggest = (val)->
-      SearchService.suggest(val).then (resp)->
-        $scope.location_names = []
-        angular.forEach resp.locations, (location)->
-          $scope.location_names.push(location.name)
-    false
+    if navigator.geolocation
+      navigator.geolocation.getCurrentPosition (pos) ->
+        ctrl.mapSettings =
+          center:
+            latitude: pos.coords.latitude
+            longitude: pos.coords.longitude
 
-    @search = ->
-      SearchService.search(ctrl.search.q).then (resp) ->
-        ctrl.locations = resp.locations
-        ctrl.mapResults()
+          zoom: 10
 
-    @searchOnCoords = (coords)->
-      SearchService.searchOnCoords(coords).then (resp) ->
-        ctrl.locations = resp.locations
-        ctrl.mapResults()
+    else
+      ctrl.mapSettings =
+        center:
+          latitude: 28.4158
+          longitude: 81.2989
 
-    @mapResults = ->
-      MapService.setLocations(@locations)
+        zoom: 8
+    api.getMinistryStrategies().success (data) ->
+      angular.forEach data, (m) ->
+        ctrl.filterMinistries[m.name] = true
 
-    angular.element(document).ready ->
-      location = MapService.initializeMap()
-      #@searchOnCoords(location)
+      ctrl.ministries = data
 
-angular.module( 'ml.controllers' ).controller( 'SearchController', ['$scope', '$log', 'SearchService', 'MapService', SearchController] )
+    ctrl.mapEvents = idle: ->
+      ctrl.getMarkers()
+
+    @getMarkers = ->
+      map = ctrl.mapInstance.getGMap()
+      nw = new google.maps.LatLng(map.getBounds().getNorthEast().lat(), map.getBounds().getSouthWest().lng())
+      se = new google.maps.LatLng(map.getBounds().getSouthWest().lat(), map.getBounds().getNorthEast().lng())
+      ministries = _.keys(_.pick(ctrl.filterMinistries, (v) ->
+        v
+      ))
+      api.getMarkers(
+        ministries: ministries
+        nwBounds: nw
+        seBounds: se
+      ).success (data) ->
+        ctrl.markers = data.locations
+
+    @suggest = (typed) ->
+      api.search(typed).then (response) ->
+        response.data.locations
+
+    @selectLocation = (item) ->
+      ctrl.mapSettings.center =
+        latitude: item.latitude
+        longitude: item.longitude
+
+
+    uiGmapIsReady.promise(2).then (instances) ->
+      instances.forEach (inst) ->
+        inst.map.ourID = inst.instance
+        return
+      return
+
+angular.module("ml").controller "SearchController", ["uiGmapIsReady", "api", SearchController ]

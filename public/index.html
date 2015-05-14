@@ -2,35 +2,53 @@
 <html ng-app="ml">
 <head>
   <title>MinistryCloud</title>
-  <link rel="stylesheet" media="all" href="/assets/application.css" />
-  <script type="text/javascript"
-          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD4oejX9bFAoV1C0PnOZcN73KRSLkYH_FQ">
-  </script>
+  <link rel="stylesheet" media="all" href="/assets/application.css">
+  <style>
+    .angular-google-map-container { height: 700px; }
+  </style>
 </head>
 <body ng-controller="SearchController as searchCtrl" class="ng-cloak">
 
   <div class="container">
-    <div class="row">
+    <div class="row form-group">
       <div class="col-md-12">
         <div>
-          <form name="searchForm" ng-submit="searchCtrl.search()" novalidate>
-            <autocomplete ng-model="searchCtrl.search.q" data="location_names" on-select="searchCtrl.select" on-type="searchCtrl.suggest"></autocomplete>
-            <input type="submit" value="Search">
-          </form>
+          <input type="text"
+                 ng-model="asyncSelected"
+                 placeholder="Search..."
+                 typeahead="location.name for location in searchCtrl.suggest($viewValue)"
+                 typeahead-wait-ms="300"
+                 typeahead-on-select="searchCtrl.selectLocation($item, $model, $label)"
+                 typeahead-editable="false"
+                 class="form-control">
         </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4">
+        <p><strong>Ministries Strategies</strong></p>
+        <div class="checkbox" ng-repeat="m in searchCtrl.ministries">
+          <label>
+            <input type="checkbox" ng-model="searchCtrl.filterMinistries[m.name]" ng-change="searchCtrl.getMarkers()"> {{m.name}}
+          </label>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <ui-gmap-google-map control="searchCtrl.mapInstance" center="searchCtrl.mapSettings.center" zoom="searchCtrl.mapSettings.zoom" bounds="searchCtrl.mapSettings.bounds" events="searchCtrl.mapEvents">
+          <ui-gmap-marker coords="m" idkey="m.id" ng-repeat="m in searchCtrl.markers">
+            <ui-gmap-window show="false">
+              <div>
+                <p><strong>{{m.name}}</strong></p>
+              </div>
+            </ui-gmap-window>
+          </ui-gmap-marker>
+        </ui-gmap-google-map>
       </div>
     </div>
   </div>
 
-  <div id="map-canvas"></div>
-  <div id="results-list">
-    <ul>
-      <li ng-repeat="location in searchCtrl.locations">
-        {{ location.name }}
-      </li>
-    </ul>
-  </div>
-
   <script src="/assets/application.js"></script>
+  <script src="//maps.googleapis.com/maps/api/js?key=AIzaSyD4oejX9bFAoV1C0PnOZcN73KRSLkYH_FQ"></script>
 </body>
 </html>
